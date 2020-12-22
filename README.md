@@ -2,7 +2,17 @@
 
 Flutterでtwitter認証を使ってログインをするサンプルです。
 
-.envにCONSUMER_KEYとCONSUMER_SECRET_KEYを設定してください。
+## 動作gif(シミュレータ)
+
+<img src="docs/sample.gif" height=500/>
+
+.envファイルにCONSUMER_KEYとCONSUMER_SECRET_KEYを設定してください。
+
+.envファイルはGitHubにはアップしたくない情報を保持する為に使用しています。
+
+Flutterで.envファイルを用いる方法については、[こちらのサイト](https://sakebook.hatenablog.com/entry/2019/06/08/011350)を参考にさせていただきました。
+
+
 
 ``` .env
 #.envファイル

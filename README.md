@@ -1,6 +1,25 @@
 # twitter_login_sample
 
-A new Flutter project.
+Flutterでtwitter認証を使ってログインをするサンプルです。
+
+.envにCONSUMER_KEYとCONSUMER_SECRET_KEYを設定してください。
+
+``` .env
+#.envファイル
+CONSUMER_KEY=123456789abcdf
+CONSUMER_SECRET_KEY=12345abcd
+```
+
+設定する値はTwitter Developer Portalサイトで作成されたアプリのAPI keyと API secret keyを使用してください。
+上記の例は、API keyが123456789abcdf、 API key secretが12345abcdの場合の設定です。
+
+アプリを作成していない方はTwitter Developer Portalサイトにアクセスし、アプリを作成します。
+https://developer.twitter.com/en/portal/dashboard
+作成後、`Projects & Apps`メニューの`Keys and tokens`タブを選択し、View KeysをクリックするとAPI keyとAPI key secretが表示されるので.envファイルに追加します。
+
+<img src="docs/image_1.png" width=500/>
+
+<img src="docs/image_2.png" width=500/>
 
 ## Getting Started
 

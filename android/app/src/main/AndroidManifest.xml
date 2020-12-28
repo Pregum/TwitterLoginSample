@@ -9,6 +9,7 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="twitter_login_sample"
         android:icon="@mipmap/ic_launcher">
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -36,6 +37,12 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+              <action android:name="android.intent.action.VIEW" />
+              <category android:name="android.intent.category.DEFAULT" />
+              <category android:name="android.intent.category.BROWSABLE" />
+              <data android:scheme="example"/> <!-- host is option -->
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

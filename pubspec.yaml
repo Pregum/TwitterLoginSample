@@ -30,6 +30,7 @@ dependencies:
   cupertino_icons: ^1.0.0
   twitter_login: ^2.1.1
   flutter_dotenv: ^2.0.1
+  dart_twitter_api: ^0.3.5
 
 dev_dependencies:
   flutter_test:

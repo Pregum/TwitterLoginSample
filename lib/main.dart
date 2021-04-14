@@ -1,8 +1,12 @@
+import 'package:dart_twitter_api/twitter_api.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:twitter_login/entity/auth_result.dart';
-import 'package:twitter_login/entity/user.dart';
+import 'package:twitter_login/entity/user.dart' as TwiLogin;
 import 'package:twitter_login/twitter_login.dart';
+
+import 'package:http/http.dart' as http;
 
 void main() async {
   await DotEnv().load('.env');
@@ -34,8 +38,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  User _user;
+  TwiLogin.User _user;
   AuthResult _authResult;
+
+  String _userId;
 
   Future _loginTwitter() async {
     final twitterLogin = TwitterLogin(
@@ -48,9 +54,14 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (result.status) {
       case TwitterLoginStatus.loggedIn:
         print('login success!');
+        print('oauthToken: ${result.authToken}');
+        print('oauthTokenSecret: ${result.authTokenSecret}');
+        final userId = await _getUserId(
+            result.user.screenName, result.authToken, result.authTokenSecret);
         this.setState(() {
           _user = result.user;
           _authResult = result;
+          _userId = userId;
         });
         break;
       case TwitterLoginStatus.cancelledByUser:
@@ -62,6 +73,26 @@ class _MyHomePageState extends State<MyHomePage> {
       default:
         break;
     }
+  }
+
+  Future<String> _getUserId(
+      String screenName, String oauthToken, String oauthTokenSecret) async {
+    final twitterApi = TwitterApi(
+      client: TwitterClient(
+        consumerKey: DotEnv().env['CONSUMER_KEY'],
+        consumerSecret: DotEnv().env['CONSUMER_SECRET_KEY'],
+        token: oauthToken,
+        secret: oauthTokenSecret,
+      ),
+    );
+
+    final user = await twitterApi.userService.usersShow(
+      screenName: screenName,
+      includeEntities: false,
+    );
+    print('userId: ${user.idStr}');
+    print('user info: ${user.toJson()}');
+    return user.idStr;
   }
 
   @override
@@ -82,7 +113,8 @@ class _MyHomePageState extends State<MyHomePage> {
               Text('authToken: ${_authResult.authToken}'),
             if (_authResult != null)
               Text('authTokenSecret: ${_authResult.authTokenSecret}'),
-            RaisedButton(
+            if (_userId != null) Text('userId: $_userId'),
+            ElevatedButton(
               child: Text('Twitter認証でログイン'),
               onPressed: _loginTwitter,
             ),
@@ -91,4 +123,17 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  // String _fetchUserId(
+  //     String screenName, String oauthToken, String oauthTokenSecret) {
+  //   Uri endPoint = Uri.https(
+  //       'api.twitter.com', '1.1/users/show.json', {'screen_name': screenName});
+  //   Map<String, String> header = {
+  //     'authorization': 'OAuth'
+  //   };
+
+  //   http.get(
+  //     endPoint.toString(),
+  //   );
+  // }
 }

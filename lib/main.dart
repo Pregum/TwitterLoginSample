@@ -1,4 +1,4 @@
-import 'package:dart_twitter_api/twitter_api.dart';
+import 'package:dart_twitter_api/twitter_api.dart' as TwiApi;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -38,10 +38,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  TwiLogin.User _user;
+  /// SNSログイン側のプラグインのユーザーです。
+  TwiLogin.User _authUser;
   AuthResult _authResult;
 
-  String _userId;
+  /// Twitter API側のプラグインのユーザーです。
+  /// こちらから紹介文やuser_idを取得しています。
+  TwiApi.User _apiUser;
 
   Future _loginTwitter() async {
     final twitterLogin = TwitterLogin(
@@ -56,12 +59,12 @@ class _MyHomePageState extends State<MyHomePage> {
         print('login success!');
         print('oauthToken: ${result.authToken}');
         print('oauthTokenSecret: ${result.authTokenSecret}');
-        final userId = await _getUserId(
+        final user = await _getUser(
             result.user.screenName, result.authToken, result.authTokenSecret);
         this.setState(() {
-          _user = result.user;
+          _authUser = result.user;
           _authResult = result;
-          _userId = userId;
+          _apiUser = user;
         });
         break;
       case TwitterLoginStatus.cancelledByUser:
@@ -75,10 +78,10 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<String> _getUserId(
+  Future<TwiApi.User> _getUser(
       String screenName, String oauthToken, String oauthTokenSecret) async {
-    final twitterApi = TwitterApi(
-      client: TwitterClient(
+    final twitterApi = TwiApi.TwitterApi(
+      client: TwiApi.TwitterClient(
         consumerKey: DotEnv().env['CONSUMER_KEY'],
         consumerSecret: DotEnv().env['CONSUMER_SECRET_KEY'],
         token: oauthToken,
@@ -92,7 +95,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
     print('userId: ${user.idStr}');
     print('user info: ${user.toJson()}');
-    return user.idStr;
+    print('user describe: ${user.description}');
+    return user;
   }
 
   @override
@@ -105,15 +109,16 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            if (_user != null) Text('email: ${_user.email}'),
-            if (_user != null) Text('name: ${_user.name}'),
-            if (_user != null) Text('screenName: ${_user.screenName}'),
-            if (_user != null) Image.network('${_user.thumbnailImage}'),
+            if (_authUser != null) Text('email: ${_authUser.email}'),
+            if (_authUser != null) Text('name: ${_authUser.name}'),
+            if (_authUser != null) Text('screenName: ${_authUser.screenName}'),
+            if (_authUser != null) Image.network('${_authUser.thumbnailImage}'),
             if (_authResult != null)
               Text('authToken: ${_authResult.authToken}'),
             if (_authResult != null)
               Text('authTokenSecret: ${_authResult.authTokenSecret}'),
-            if (_userId != null) Text('userId: $_userId'),
+            if (_apiUser != null) Text('userId: ${_apiUser.idStr}'),
+            if (_apiUser != null) Text('description: ${_apiUser.description}'),
             ElevatedButton(
               child: Text('Twitter認証でログイン'),
               onPressed: _loginTwitter,
